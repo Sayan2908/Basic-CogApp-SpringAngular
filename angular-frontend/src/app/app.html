@@ -1,0 +1,102 @@
+<!-- Toaster Notification -->
+@if (toaster().isVisible) {
+  <div class="toaster" [class.success]="toaster().type === 'success'" [class.error]="toaster().type === 'error'">
+    {{ toaster().message }}
+  </div>
+}
+
+<!-- Main Application Container -->
+<div class="app-container">
+  
+  <header class="app-header">
+    <h1> BASIC APPLICATION</h1>
+  </header>
+
+  <main class="main-content">
+    
+    <!-- HOME PAGE VIEW -->
+    @if (page() === 'home') {
+      <div class="animate-fade-in">
+        <h2 class="page-subtitle">Welcome!</h2>
+        <div class="home-grid">
+          <div (click)="navigateTo('users')" class="card-hover">
+            <h3>Manage Users</h3>
+            <p>View the list of all users and add new ones to the system.</p>
+          </div>
+          <div (click)="navigateTo('policies')" class="card-hover">
+            <h3>Manage Policies</h3>
+            <p>Browse all insurance policies and create new entries.</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- USERS PAGE VIEW -->
+    @if (page() === 'users') {
+      <div class="animate-fade-in">
+        <button (click)="navigateTo('home')" class="back-button">&larr; Back to Home</button>
+        <h2 class="page-title">Our Users</h2>
+        
+        @if(isLoading()) { <div class="loader-container"><div class="loader"></div></div> }
+        @if(error()) { <div class="error-banner">{{ error() }}</div> }
+        
+        @if(!isLoading() && !error() && users().length > 0) {
+          <div class="data-grid">
+            @for(user of users(); track user.id) {
+              <div class="data-card">
+                <h3>{{ user.name }}</h3>
+                <p class="email">{{ user.email }}</p>
+              </div>
+            }
+          </div>
+        } @else if (!isLoading() && !error()) {
+          <p class="empty-state">No users found. Add one below!</p>
+        }
+        
+        <div class="form-container">
+          <h3>Add a New User</h3>
+          <form (ngSubmit)="addUser()">
+            <div class="form-group"><label for="name">Name</label><input id="name" type="text" [(ngModel)]="newUserName" name="name" placeholder="e.g., Jane Doe" required></div>
+            <div class="form-group"><label for="email">Email</label><input id="email" type="email" [(ngModel)]="newUserEmail" name="email" placeholder="e.g., jane.doe@example.com" required></div>
+            <button type="submit" class="submit-button" [disabled]="!newUserName || !newUserEmail">Add User</button>
+          </form>
+        </div>
+      </div>
+    }
+
+    <!-- POLICIES PAGE VIEW -->
+    @if (page() === 'policies') {
+      <div class="animate-fade-in">
+        <button (click)="navigateTo('home')" class="back-button">&larr; Back to Home</button>
+        <h2 class="page-title">Insurance Policies</h2>
+
+        @if(isLoading()) { <div class="loader-container"><div class="loader"></div></div> }
+        @if(error()) { <div class="error-banner">{{ error() }}</div> }
+
+        @if(!isLoading() && !error() && policies().length > 0) {
+          <div class="data-grid">
+            @for(policy of policies(); track policy.id) {
+              <div class="data-card">
+                <h3>{{ policy.policyNumber }}</h3>
+                <p>{{ policy.policyType }}</p>
+                <p class="premium">Premium: $ {{ policy.premium.toFixed(2) }}</p>
+              </div>
+            }
+          </div>
+        } @else if (!isLoading() && !error()) {
+          <p class="empty-state">No policies found. Add one below!</p>
+        }
+        
+        <div class="form-container">
+          <h3>Add a New Policy</h3>
+          <form (ngSubmit)="addPolicy()">
+            <div class="form-group"><label for="policyNumber">Policy Number</label><input id="policyNumber" type="text" [(ngModel)]="newPolicyNumber" name="policyNumber" placeholder="e.g., POL-12345" required></div>
+            <div class="form-group"><label for="policyType">Policy Type</label><input id="policyType" type="text" [(ngModel)]="newPolicyType" name="policyType" placeholder="e.g., Auto, Health" required></div>
+            <div class="form-group"><label for="premium">Premium ($)</label><input id="premium" type="number" step="0.01" [(ngModel)]="newPolicyPremium" name="premium" placeholder="e.g., 599.99" required></div>
+            <button type="submit" class="submit-button" [disabled]="!newPolicyNumber || !newPolicyType || !newPolicyPremium">Add Policy</button>
+          </form>
+        </div>
+      </div>
+    }
+  </main>
+</div>
